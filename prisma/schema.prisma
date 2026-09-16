@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  characters   Character[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Character {
+  id        String   @id @default(cuid())
+  name      String
+  class     String
+  level     Int      @default(1)
+  hp        Int      @default(100)
+  maxHp     Int      @default(100)
+  attack    Int      @default(10)
+  defense   Int      @default(5)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Enemy {
+  id        String   @id @default(cuid())
+  name      String
+  level     Int      @default(1)
+  hp        Int
+  maxHp     Int
+  attack    Int
+  defense   Int
+  createdAt DateTime @default(now())
+}
