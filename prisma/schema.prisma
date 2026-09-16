@@ -13,34 +13,77 @@ model User {
   email        String      @unique
   passwordHash String
   characters   Character[]
+  battles      Battle[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 }
 
 model Character {
-  id        String   @id @default(cuid())
-  name      String
-  class     String
-  level     Int      @default(1)
-  hp        Int      @default(100)
-  maxHp     Int      @default(100)
-  attack    Int      @default(10)
-  defense   Int      @default(5)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  characterClass String
+  level         Int      @default(1)
+
+  baseHp        Int
+  baseAttack    Int
+
+  hp            Int
+  maxHp         Int
+
+  attack        Int
+  defense       Int      @default(0)
+
+  avatarId      String?
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  battles       Battle[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
 }
 
 model Enemy {
-  id        String   @id @default(cuid())
-  name      String
-  level     Int      @default(1)
-  hp        Int
-  maxHp     Int
-  attack    Int
-  defense   Int
+  id          String   @id @default(cuid())
+  name        String
+  level       Int      @default(1)
+  hp          Int
+  maxHp       Int
+  attackPower Int
+  defense     Int      @default(0)
+
+  battles     Battle[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Battle {
+  id          String   @id @default(cuid())
+
+  characterId String
+  enemyId     String
+  userId      String
+
+  diceRoll    Int
+  success     Boolean
+
+  damageToEnemy     Int @default(0)
+  damageToCharacter Int @default(0)
+
+  characterHp Int
+  enemyHp     Int
+
   createdAt DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  enemy     Enemy     @relation(fields: [enemyId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([enemyId])
+  @@index([userId])
 }
